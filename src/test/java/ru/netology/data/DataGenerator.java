@@ -5,13 +5,15 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import ru.netology.data.Registration;
 
 import java.util.Locale;
 
 import static io.restassured.RestAssured.given;
 
 public class DataGenerator {
-    public static RequestSpecification requestSpec = new RequestSpecBuilder()
+    private static Faker faker = new Faker(new Locale("en"));
+    private static RequestSpecification requestSpec = new RequestSpecBuilder()
             .setBaseUri("http://localhost")
             .setPort(9999)
             .setAccept(ContentType.JSON)
@@ -22,36 +24,55 @@ public class DataGenerator {
     private DataGenerator() {
     }
 
-    public static void setupUser(RegistrationDto registrationDto) {
-        given().spec(requestSpec)
-                .body(registrationDto)
+    static void registerUser(Registration user) {
+        given()
+                .spec(requestSpec)
+                .body(user)
                 .when()
                 .post("/api/system/users")
                 .then()
                 .statusCode(200);
     }
 
-    public static String getLogin(String locale) {
-        Faker faker = new Faker(new Locale(locale));
-        return faker.name().username();
+    static String getLogin() {
+        return faker.name().firstName().toLowerCase();
     }
 
-    public static String getPassword(String locale) {
-        Faker faker = new Faker(new Locale(locale));
+    static String getPassword() {
         return faker.internet().password();
     }
 
-    public static RegistrationDto generateValidUser(String locale) {
-        RegistrationDto registrationDto = new RegistrationDto(getLogin(locale), getPassword(locale), "active");
-        setupUser(registrationDto);
-        return registrationDto;
+    public static class AddUser {
+
+        public static Registration addUserValid() {
+            Registration user = new Registration(getLogin(), getPassword(), "active");
+            registerUser(user);
+            return user;
+        }
+
+        public static Registration addUserPasswordInvalid() {
+            String login = getLogin();
+            Registration user = new Registration(login, getPassword(), "active");
+            registerUser(user);
+            return new Registration(login, getPassword(), "active");
+        }
+
+        public static Registration addUserLoginInvalid() {
+            String password = getPassword();
+            Registration user = new Registration(getLogin(),password, "active");
+            registerUser(user);
+            return new Registration(getLogin(), password, "active");
+        }
+
+        public static Registration addUserBlocked() {
+            Registration user = new Registration(getLogin(), getPassword(), "blocked");
+            registerUser(user);
+            return user;
+        }
+
+        public static Registration addUserNotRegistered() {
+            Registration user = new Registration(getLogin(), getPassword(), "active");
+            return user;
+        }
     }
-
-    public static RegistrationDto generateInvalidUser(String locale) {
-        RegistrationDto registrationDto = new RegistrationDto(getLogin(locale), getPassword(locale), "blocked");
-        setupUser(registrationDto);
-        return registrationDto;
-    }
-
-
 }
