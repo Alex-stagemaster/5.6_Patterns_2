@@ -1,5 +1,6 @@
 package ru.netology.test;
 
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.data.Registration;
@@ -10,6 +11,8 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 import static ru.netology.data.DataGenerator.AddUser.*;
 
+
+
 public class AuthTest {
     @BeforeEach
     void setup() {
@@ -18,16 +21,16 @@ public class AuthTest {
 
     @Test
     void positiveAllInputActive() {
-        Registration testUser = addUserValid();
+        Registration testUser = addUser("active");
         $("[data-test-id=login] input").setValue(testUser.getLogin());
         $("[data-test-id=password] input").setValue(testUser.getPassword());
         $(".button__content").click();
-        $(".App_appContainer__3jRx1 h2").shouldBe(visible).shouldHave(text("Личный кабинет"));
+        $(".heading").shouldBe(Condition.text("Личный кабинет"));
     }
 
     @Test
     void negativeAllInputBlocked() {
-        Registration testUser = addUserBlocked();
+        Registration testUser = addUser("blocked");
         $("[data-test-id=login] input").setValue(testUser.getLogin());
         $("[data-test-id=password] input").setValue(testUser.getPassword());
         $(".button__content").click();

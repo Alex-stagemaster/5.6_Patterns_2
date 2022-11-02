@@ -44,8 +44,8 @@ public class DataGenerator {
 
     public static class AddUser {
 
-        public static Registration addUserValid() {
-            Registration user = new Registration(getLogin(), getPassword(), "active");
+        public static Registration addUser(String status) {
+            Registration user = new Registration(getLogin(), getPassword(), status);
             registerUser(user);
             return user;
         }
@@ -64,11 +64,6 @@ public class DataGenerator {
             return new Registration(getLogin(), password, "active");
         }
 
-        public static Registration addUserBlocked() {
-            Registration user = new Registration(getLogin(), getPassword(), "blocked");
-            registerUser(user);
-            return user;
-        }
 
         public static Registration addUserNotRegistered() {
             Registration user = new Registration(getLogin(), getPassword(), "active");
